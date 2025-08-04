@@ -1,0 +1,1 @@
+# Verifies firewall rules and open ports

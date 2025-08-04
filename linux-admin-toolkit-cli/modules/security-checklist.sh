@@ -1,0 +1,1 @@
+# Performs security checks (e.g., rootkits, SSH configs)

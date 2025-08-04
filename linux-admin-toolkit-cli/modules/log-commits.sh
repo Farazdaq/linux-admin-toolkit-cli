@@ -1,0 +1,1 @@
+# Logs commit history to Git

@@ -1,0 +1,1 @@
+# Setup script to prepare the environment and install dependencies

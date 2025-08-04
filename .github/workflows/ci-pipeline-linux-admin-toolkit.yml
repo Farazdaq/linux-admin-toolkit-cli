@@ -1,28 +1,30 @@
-name: CI Pipeline for Linux Admin Toolkit
+name: CI/CD Pipeline for Linux Admin Toolkit
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  release:
+    types: [published]
 
 jobs:
   validate-scripts:
     runs-on: ubuntu-latest
     steps:
-      - name:  Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name:  Make Scripts Executable
+      - name: Set up Bash Execution Permissions
         run: chmod +x modules/*.sh setup.sh tui.sh
 
-      - name:  Lint Bash Scripts (ShellCheck)
+      - name: Lint Shell Scripts
         uses: ludeeus/action-shellcheck@master
 
-      - name:  Run Sample Test Module
+      - name: Run Basic Health Test
         run: ./modules/system-health.sh || true
 
-      - name:  Archive Logs
+      - name: Archive Action Logs
         uses: actions/upload-artifact@v3
         with:
           name: logs
@@ -33,18 +35,45 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - name:  Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name:  Setup Git
+      - name: Git Config for Auto-Commit
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "ci@linux-cli.local"
 
-      - name:  Commit Logs (if any changes)
+      - name: Commit Updated Logs
         run: |
           git add logs/actions.log || true
-          git diff --cached --quiet || git commit -m " Auto-log commit [CI]"
+          git diff --cached --quiet || git commit -m "Auto-log commit [CI]"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-release:
+    needs: gitops-commit
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Create Tarball Package
+        run: |
+          mkdir dist
+          tar -czf dist/linux-admin-toolkit.tar.gz modules/ tui.sh setup.sh config.json LICENSE README.md
+
+      - name: Upload Release Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-admin-toolkit
+          path: dist/linux-admin-toolkit.tar.gz
+
+  deploy-stub:
+    needs: build-release
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy Toolkit to Server (Placeholder)
+        run: echo "Add SSH deployment or GitHub Pages/CDN logic here"

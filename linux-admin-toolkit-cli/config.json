@@ -1,0 +1,95 @@
+{
+  //  Backup Configuration
+  "backup": {
+    "source_dirs": ["/etc", "/var/www", "/home"], // Directories to back up
+    "backup_dir": "/opt/backups", // Where backups will be stored
+    "retention_days": 7 // Number of days to keep old backups
+  },
+
+  //  System Health Check Configuration
+  "system_health": {
+    "cpu_threshold": 80, // CPU usage % to trigger alert
+    "memory_threshold": 85, // Memory usage % to trigger alert
+    "log_file": "/var/log/system_health.log" // Log file to write health report
+  },
+
+  //  Package Manager Configuration
+  "update_packages": {
+    "allowed_managers": ["apt", "yum", "dnf", "zypper"] // Supported Linux package managers
+  },
+
+  //  Service Management
+  "services": {
+    "critical_services": ["nginx", "mysql", "sshd"] // List of essential services to monitor
+  },
+
+  //  File Expiry Tracker
+  "file_expiry_tracker": {
+    "tracked_files": [
+      {
+        "name": "ssl_cert", // Unique identifier
+        "path": "/etc/ssl/certs/domain.pem", // File path
+        "expiry_date": "2025-12-01" // Expiry date to watch for
+      },
+      {
+        "name": "company_license",
+        "path": "/opt/licenses/license.pdf",
+        "expiry_date": "2025-10-10"
+      }
+    ]
+  },
+
+  //  GitOps-Style Logging Configuration
+  "log_commits": {
+    "log_dir": "logs/", // Path to log file directory
+    "commit_after_each_action": true // Auto-commit after script run
+  },
+
+  //  Log Cleaning
+  "log_cleaner": {
+    "paths": ["/var/log", "/opt/backups"], // Directories to scan for old logs
+    "days_old": 30 // Delete logs older than X days
+  },
+
+  //  Firewall Check Configuration
+  "firewall_check": {
+    "accepted_ports": [22, 80, 443], // Ports allowed by firewall
+    "firewall_tool": "ufw" // Tool used (ufw, iptables, nft)
+  },
+
+  //  Docker Monitor
+  "docker_monitor": {
+    "alert_on_high_cpu": true, // Whether to alert on high CPU
+    "cpu_threshold": 75 // CPU usage % threshold for alert
+  },
+
+  //  Network Diagnostics
+  "network_checker": {
+    "targets": ["8.8.8.8", "1.1.1.1"], // IPs or domains to ping
+    "dns_servers": ["8.8.8.8", "1.1.1.1"], // DNS servers to test
+    "latency_threshold_ms": 100 // Latency threshold in ms
+  },
+
+  //  User Audit
+  "user_audit": {
+    "check_ssh_keys": true, // Should check for .ssh/authorized_keys
+    "flag_inactive_users_days": 30 // Flag users inactive for X days
+  },
+
+  //  Security Scanning
+  "security_checklist": {
+    "run_lynis": true, // Run Lynis audit tool
+    "run_chkrootkit": true // Run chkrootkit malware scan
+  },
+
+  //  Cron Job Audit
+  "cron_audit": {
+    "log_path": "/var/log/cron_audit.log" // File to store cron job audit info
+  },
+
+  //  System Info Reporting
+
+  "sysinfo_report": {
+    "output_file": "/var/log/sysinfo_report.txt" // File where system info is written
+  }
+}

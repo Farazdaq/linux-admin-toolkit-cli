@@ -1,0 +1,50 @@
+name: CI Pipeline for Linux Admin Toolkit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - name:  Checkout Code
+        uses: actions/checkout@v3
+
+      - name:  Make Scripts Executable
+        run: chmod +x modules/*.sh setup.sh tui.sh
+
+      - name:  Lint Bash Scripts (ShellCheck)
+        uses: ludeeus/action-shellcheck@master
+
+      - name:  Run Sample Test Module
+        run: ./modules/system-health.sh || true
+
+      - name:  Archive Logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: logs/actions.log
+
+  gitops-commit:
+    needs: validate-scripts
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name:  Checkout Code
+        uses: actions/checkout@v3
+
+      - name:  Setup Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "ci@linux-cli.local"
+
+      - name:  Commit Logs (if any changes)
+        run: |
+          git add logs/actions.log || true
+          git diff --cached --quiet || git commit -m " Auto-log commit [CI]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
